@@ -6,14 +6,19 @@ function start(route) {
         var pathname = url.parse(request.url).pathname;
         console.log("Request for " + pathname + " received.");
 
-        response.writeHead(200, {"Content-Type" : "text/plain"});
         route(pathname, function (err, data) {
-            if (err) throw err;
-            console.log('writing js to response:', data.toString())
+            if (err) {
+                console.log(err);
+                response.writeHead(400);
+                response.write('400 file not found');
+                response.end();
+                return;
+            }
+            response.writeHead(200, {"Content-Type" : "text/plain"});
+            console.log('writing to response:', data.toString());
             response.write(data.toString());
             response.end();
         });
-        response.write("Hello World\n");
     }
 
     http.createServer(onRequest).listen(8888);
